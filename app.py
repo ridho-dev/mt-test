@@ -139,9 +139,33 @@ def home():
 def input(input):
     return input
 
+@app.route('/test', methods=['GET'])
+def test():
+    return str(request.args['t'])
+    
+@app.route('/test2', methods=['GET'])
+def test2():
+    return str(request.args.get('t2'))
+
+@app.route('/test3', methods=['GET'])
+def test3():
+    return model.translate('siapa?')
+
+@app.route('/test4')
+def test4():
+    return model.translate('siapa?')
+
+@app.route('/test5', methods=['GET'])
+def test5():
+    data = {
+        "input": "test5",
+        "output": "test5",
+    }
+    return jsonify(data)
+
 @app.route('/translate', methods=['GET'])
 def translate():
-    input_sentence = str(request.args['s'])
+    input_sentence = request.args.get('s')
     data = {
         "input": input_sentence,
         "output": model.translate(input_sentence),

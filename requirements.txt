@@ -1,6 +1,6 @@
-flask
-tensorflow
-numpy
-flask_sqlalchemy
+flask==2.3.1
+tensorflow==2.12.0
+numpy==1.23.5
+flask_sqlalchemy==3.0.3
 gunicorn
-psycopg2
+psycopg2==2.9.6

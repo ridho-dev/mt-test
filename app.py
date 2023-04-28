@@ -59,8 +59,17 @@ class MyModel(tf.keras.Model):
         attention_wts, decoder_output, state_h, _ = self.decoder(decoder_input, encoder_output, state_h)
         return decoder_output
 
-    def test(self):
-        return 'Class MyModel Called'
+    def input_shape_test(self):
+        inp = 'siapa?'
+        preprocessed = preprocessing(inp)
+        ind_tkn = tokenizer_indo.texts_to_sequences([preprocessed])
+        w = pad_sequences(ind_tkn, maxlen=indo_max, padding='post')[0]
+
+        inputs = tf.convert_to_tensor(w.reshape(1, -1))  # inisialisasi input tensor reshape w(18, ) --> (1, 18) 1 dimensi sebelum dimensi ke 1
+        state_h = tf.zeros((1, self.units))  # inisialisasi hidden layer (1, 1024)
+        encoder_output, state_h = self.encoder(inputs, state_h)
+        return f'enc_out: {encoder_output}, state_h: {state_h}'
+    
     def translate(self, input_sentence=''):
         if input_sentence == '':
             # random number -> k
@@ -153,11 +162,19 @@ def input(input):
 
 @app.route('/test', methods=['GET'])
 def test():
-    return str(request.args['t'])
+    dataset = tf.data.Dataset.from_tensor_slices((indo_train, batak_train)).shuffle(BUFFER_SIZE)
+    dataset = dataset.batch(BATCH_SIZE, drop_remainder=True)
+
+    model = MyModel(indo_vocab, batak_vocab, embedding_dim, units)
+    model.build(input_shape=(1, 18))
+
+    model.load_weights("weight1000.h5") 
+    translation = model.translate('siapa?')
+    return translation
     
-@app.route('/test2', methods=['GET'])
+@app.route('/test2')
 def test2():
-    return str(request.args.get('t2'))
+    return model.input_shape_test()
 
 @app.route('/test3')
 def test3():

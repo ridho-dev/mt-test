@@ -127,20 +127,19 @@ model.load_weights("weight1000.h5")
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def home():
+    message = "Halo!"
+    return message
+
+@app.route('/translate', methods=['GET'])
+def translate():
     input_sentence = str(request.args['s'])
     data = {
         "input": input_sentence,
         "output": model.translate(input_sentence),
     }
     return jsonify(data)
-
-# @app.route('/translate', methods=['POST'])
-# def translate():
-#     input_sentence = request.form['input-sentence']
-#     output_sentence = model.translate(input_sentence)
-#     return output_sentence
 
 
 if __name__ == "__main__":

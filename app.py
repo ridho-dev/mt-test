@@ -59,6 +59,8 @@ class MyModel(tf.keras.Model):
         attention_wts, decoder_output, state_h, _ = self.decoder(decoder_input, encoder_output, state_h)
         return decoder_output
 
+    def test(self):
+        return 'Class MyModel Called'
     def translate(self, input_sentence=''):
         if input_sentence == '':
             # random number -> k
@@ -99,8 +101,8 @@ class MyModel(tf.keras.Model):
             attention_wts, decoder_output, state_h, _ = self.decoder(decoder_input, encoder_output, state_h)
             attention_wts = attention_wts.numpy().flatten()  # list --> narrayobject 1 dimensi
             predicted_word = tf.argmax(decoder_output[0]).numpy()  # averagemax (1, 2354) --> (2354, )
-            if predicted_word == tokenizer_indo.texts_to_sequences(['<eos>'])[0][
-                0]:  # proses menerjemahkan selesai jika ada <eos>
+            # proses menerjemahkan selesai jika ada <eos>
+            if predicted_word == tokenizer_indo.texts_to_sequences(['<eos>'])[0][0]:  
                 break
             result += tokenizer_batak.sequences_to_texts([[predicted_word]])[0] + ' '
             decoder_input = tf.expand_dims([predicted_word], 0)  # keluaran digunakan sebagai masukan lagi pada decoder
@@ -125,6 +127,16 @@ model.build(input_shape=(1, 18))
 
 model.load_weights("weight1000.h5")
 
+# # tes encoder dengan input langsung
+# encoder1 = Encoder(indo_vocab, embedding_dim, units)
+# encoder_output1, state_h1 = encoder1(input_shape=(1, 18))
+# print(encoder1)
+
+# # tes encoder dengan input pada mymodel
+# encoder2 = Encoder(indo_vocab, embedding_dim, units)
+
+# encoder2.build(input_shape=(1, 18))
+# print(encoder2)
 
 
 app = Flask(__name__)
@@ -147,19 +159,20 @@ def test():
 def test2():
     return str(request.args.get('t2'))
 
-@app.route('/test3', methods=['GET'])
+@app.route('/test3')
 def test3():
     return model.translate('siapa?')
 
 @app.route('/test4')
 def test4():
-    return model.translate('siapa?')
+    return model.test()
 
 @app.route('/test5', methods=['GET'])
 def test5():
+    input_str = str(request.args.get('t5'))
     data = {
-        "input": "test5",
-        "output": "test5",
+        "input": input_str,
+        "output": input_str,
     }
     return jsonify(data)
 

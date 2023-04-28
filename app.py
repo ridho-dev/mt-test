@@ -1,3 +1,4 @@
+import os
 import re
 import pickle
 import tensorflow as tf
@@ -7,6 +8,7 @@ from enc_dec import Encoder, Decoder
 from keras import Input
 from keras.utils import pad_sequences
 from flask import Flask, render_template, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 
 
 
@@ -126,11 +128,16 @@ model.load_weights("weight1000.h5")
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mt_test_user:PVvuOpLv1AJVELE7ODS59QEfiWVZ2myF@dpg-ch5lq3l269v5rfrftp0g-a.oregon-postgres.render.com/mt_test'
+db = SQLAlchemy(app)
 
 @app.route('/')
 def home():
-    message = "Halo!"
-    return message
+    return render_template('index.html')
+
+@app.route('/t/<input>')
+def input(input):
+    return input
 
 @app.route('/translate', methods=['GET'])
 def translate():

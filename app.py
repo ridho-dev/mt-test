@@ -170,7 +170,7 @@ def test():
     translation = model.translate('siapa?')
     return translation
     
-@app.route('/test2', method=['GET'])
+@app.route('/test2', methods=['GET'])
 def test2():
     input_str = str(request.args.get('t5'))
     dataset = tf.data.Dataset.from_tensor_slices((indo_train, batak_train)).shuffle(BUFFER_SIZE)

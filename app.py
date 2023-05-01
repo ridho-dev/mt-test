@@ -8,7 +8,6 @@ from enc_dec import Encoder, Decoder
 from keras import Input
 from keras.utils import pad_sequences
 from flask import Flask, render_template, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 
 
 
@@ -171,10 +170,19 @@ def test():
     translation = model.translate('siapa?')
     return translation
     
-@app.route('/test2')
+@app.route('/test2', method=['GET'])
 def test2():
-    tfv = tf.__version__
-    return tfv
+    input_str = str(request.args.get('t5'))
+    dataset = tf.data.Dataset.from_tensor_slices((indo_train, batak_train)).shuffle(BUFFER_SIZE)
+    dataset = dataset.batch(BATCH_SIZE, drop_remainder=True)
+
+    model = MyModel(indo_vocab, batak_vocab, embedding_dim, units)
+    model.build(input_shape=(1, 18))
+    model.call(input_shape=(1, 18))
+
+    model.load_weights("weight1000.h5") 
+    translation = model.translate(input_str)
+    return translation
 
 @app.route('/test3')
 def test3():

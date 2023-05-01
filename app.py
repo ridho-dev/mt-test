@@ -149,8 +149,6 @@ model.load_weights("weight1000.h5")
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mt_test_user:PVvuOpLv1AJVELE7ODS59QEfiWVZ2myF@dpg-ch5lq3l269v5rfrftp0g-a.oregon-postgres.render.com/mt_test'
-db = SQLAlchemy(app)
 
 @app.route('/')
 def home():
@@ -167,6 +165,7 @@ def test():
 
     model = MyModel(indo_vocab, batak_vocab, embedding_dim, units)
     model.build(input_shape=(1, 18))
+    model.call(input_shape=(1, 18))
 
     model.load_weights("weight1000.h5") 
     translation = model.translate('siapa?')
@@ -174,7 +173,8 @@ def test():
     
 @app.route('/test2')
 def test2():
-    return model.input_shape_test()
+    tfv = tf.__version__
+    return tfv
 
 @app.route('/test3')
 def test3():
@@ -195,7 +195,7 @@ def test5():
 
 @app.route('/translate', methods=['GET'])
 def translate():
-    input_sentence = request.args.get('s')
+    input_sentence = str(request.args.get('s'))
     data = {
         "input": input_sentence,
         "output": model.translate(input_sentence),
